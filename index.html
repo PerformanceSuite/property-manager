@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Portal - Financial & Asset Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- General Reset & Typography --- */
+        :root {
+            --primary-color: #3498db; /* A professional blue */
+            --primary-hover: #2980b9;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --text-color: #2c3e50;
+            --background-light: #ecf0f1;
+            --card-background: #ffffff;
+            --border-color: #bdc3c7;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; /* Modern, clean font */
+            line-height: 1.6; 
+            color: var(--text-color); 
+            max-width: 1200px; /* Increased max width */
+            margin: 0 auto; 
+            padding: 30px; 
+            background: var(--background-light); 
+        }
+
+        h1, h2, h3 { 
+            color: var(--text-color); 
+            font-weight: 700; 
+        }
+
+        h1 { font-size: 2.2em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+        h2 { font-size: 1.5em; }
+        h3 { font-size: 1.1em; font-weight: 600; margin-top: 0; }
+
+        /* --- Layout & Cards --- */
+        .header-info { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+        }
+
+        .container { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr; /* Updated layout for Financials/Strategy */
+            gap: 30px; /* Increased gap */
+        }
+
+        .main-dashboard {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card { 
+            background: var(--card-background); 
+            padding: 25px; /* Increased padding */
+            border-radius: 12px; /* Softer rounded corners */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Stronger, softer shadow */
+            transition: transform 0.2s; /* Hover effect */
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .full-width { grid-column: span 2; }
+
+        /* --- Form & Input Styles (Cleaner) --- */
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; color: #555; }
+        input[type="number"], input[type="text"], select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        button { 
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 12px 15px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 1em; 
+            font-weight: 600;
+            width: 100%; 
+            transition: background-color 0.3s;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+
+        /* --- Dashboard Specifics & Visualization --- */
+        .financial-output { 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-top: 15px; 
+            text-align: center;
+        }
+
+        .positive-flow { 
+            background: #e8fde8; /* Lighter success background */
+            border: 1px solid var(--success-color); 
+            color: #1e8449; /* Darker green text */
+        }
+
+        .negative-flow { 
+            background: #fdedec; 
+            border: 1px solid var(--danger-color); 
+            color: var(--danger-color); 
+        }
+
+        .net-position { 
+            font-size: 1.8em; 
+            font-weight: 700; 
+            margin-bottom: 5px; 
+        }
+
+        .asset-strategy-ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .asset-strategy-ul li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .asset-strategy-ul li::before {
+            content: '✓'; /* Checkmark for key metrics */
+            color: var(--success-color);
+            font-weight: 700;
+            position: absolute;
+            left: 0;
+        }
+        
+        /* --- Property Dashboard & Table --- */
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-paid { background-color: #d1e7dd; color: #0f5132; }
+        .status-due { background-color: #fff3cd; color: #664d03; }
+        
+        table { 
+            width: 100%; 
+            border-collapse: separate; /* Use separate for border-radius on rows/cells */
+            border-spacing: 0;
+            margin-top: 20px; 
+        }
+        
+        th, td { 
+            text-align: left; 
+            padding: 12px 15px; 
+            border-bottom: 1px solid #eee; 
+        }
+        
+        th { 
+            background-color: #f1f4f8; 
+            font-weight: 600;
+            color: var(--text-color);
+            position: sticky; top: 0; /* Sticky headers for long tables */
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .satisfaction-meter { height: 10px; background: var(--border-color); border-radius: 5px; overflow: hidden; margin-top: 5px; }
+        .satisfaction-fill { height: 100%; background: var(--primary-color); transition: width 0.5s ease-out; } 
+    </style>
+</head>
+<body>
+
+    <div class="header-info">
+        <h1>🏡 Owner Financial & Asset Dashboard</h1>
+        <div>
+            <p>Welcome, <strong>Shanie Holman</strong> | PM: <a href="#">Dan Connolly</a></p>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <div class="card">
+            <h2>💰 Personal Financial Tracker</h2>
+            <p>Calculate your **Total Monthly Net Position** incorporating your asset's profit.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3>📉 Expenses</h3>
+                    <label>Current Apartment Rent ($)</label>
+                    <input type="number" id="ownerRent" value="2500" oninput="calculateFinances()">
+                    
+                    <label>Personal Utilities ($)</label>
+                    <input type="number" id="ownerUtilities" value="150" oninput="calculateFinances()">
+                    
+                    <label>Property Tax Liability ($/mo est)</label>
+                    <input type="number" id="taxLiability" value="400" oninput="calculateFinances()">
+                </div>
+
+                <div>
+                    <h3>📈 Income Sources</h3>
+                    <label>Job Income ($)</label>
+                    <input type="number" id="jobIncome" value="6000" oninput="calculateFinances()">
+                    
+                    <label>Property Rental Income ($)</label>
+                    <input type="number" id="rentalIncome" value="3200" oninput="calculateFinances()">
+                    
+                    </div>
+            </div>
+
+            <hr style="margin: 25px 0;">
+
+            <div id="financialOutput" class="financial-output positive-flow">
+                </div>
+        </div>
+
+        <div class="card">
+            <h2>🧠 Asset Strategy & Insights</h2>
+            <p>Summary of your property's performance and long-term outlook.</p>
+            <ul class="asset-strategy-ul">
+                <li><strong>Rental Cash Flow:</strong> <span id="cashflowDisplay" style="font-weight: 700; color: var(--success-color);">--</span> / month (Net after Property Tax)</li>
+                <li><strong>Mortgage Equity Build:</strong> Approx. <span style="font-weight: 700;">$900</span>/month (Principal paydown)</li>
+                <li><strong>Projected Appreciation:</strong> <span style="font-weight: 700;">+5%</span> YOY (Based on market data)</li>
+            </ul>
+            <hr>
+            <h3>Tax Management</h3>
+            <p style="font-size: 0.9em;">
+                <span style="font-weight: bold; color: var(--primary-color);">Action Item:</span> Confirm you are deducting **mortgage interest** and **eligible repairs** to maximize tax offsets. <a href="#" style="color: var(--primary-color);">View Tax Docs</a>
+            </p>
+            
+            <a href="#" style="font-size: 0.9em; display: block; margin-top: 10px;">Explore 1031 Exchange Options</a>
+        </div>
+
+        <div class="main-dashboard">
+            <div class="card">
+                <h2>🏠 Property Status (123 Main St)</h2>
+                <h3>Tenant & Satisfaction</h3>
+                <p><strong>Tenant:</strong> Gregg Marshall (Lease ends: Mar 31, 2026)</p>
+                <p><strong>Satisfaction Index:</strong> <span id="satisfactionValue">8.5/10</span></p>
+                <div class="satisfaction-meter"><div id="satisfactionFill" class="satisfaction-fill" style="width: 85%;"></div></div>
+                <p style="margin-top: 15px;"><small>Latest Feedback: **"Water pressure in shower low"** - <span style="color: var(--danger-color); font-weight: 600;">Open Request</span></small></p>
+            </div>
+
+            <div class="card">
+                <h2>📬 PM Communication</h2>
+                <h3>New Message / Request</h3>
+                <textarea placeholder="Leave a message for Dan (PM) or schedule inspection..." rows="4"></textarea>
+                <button onclick="alert('Message sent to Dan!')">📩 Send Message</button>
+                <p style="font-size: 0.8em; margin-top: 10px;">Your PM responds to all messages within 4 hours.</p>
+            </div>
+
+            <div class="card">
+                <h2>🛠️ Active Vendors</h2>
+                <h3>Quick Contacts</h3>
+                <ul>
+                    <li>**Plumbing:** QuickFix Pros <span style="float: right; color: var(--primary-color);">(555-0199)</span></li>
+                    <li>**Landscaping:** GreenThumb <span style="float: right; color: var(--primary-color);">(555-0123)</span></li>
+                    <li>**HVAC:** CoolAir Inc <span style="float: right; color: var(--primary-color);">(555-0100)</span></li>
+                    <li><small><a href="#">View All Vendors & Contracts</a></small></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2>📅 Rent Payment Log</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Tenant</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>PM Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Nov 1, 2025</td>
+                        <td>Gregg Marshall</td>
+                        <td>$3,200</td>
+                        <td><span class="status-badge status-due">Due Soon</span></td>
+                        <td>Expected Nov 1st</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 1, 2025</td>
+                        <td>Gregg Marshall</td>
+                        <td>$3,200</td>
+                        <td><span class="status-badge status-paid">Paid</span></td>
+                        <td>On time (ACH)</td>
+                    </tr>
+                    <tr>
+                        <td>Sep 1, 2025</td>
+                        <td>Gregg Marshall</td>
+                        <td>$3,200</td>
+                        <td><span class="status-badge status-paid">Paid</span></td>
+                        <td>On time</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        function calculateFinances() {
+            // Get Values
+            const ownerRent = parseFloat(document.getElementById('ownerRent').value) || 0;
+            const ownerUtils = parseFloat(document.getElementById('ownerUtilities').value) || 0;
+            const jobIncome = parseFloat(document.getElementById('jobIncome').value) || 0;
+            const rentalIncome = parseFloat(document.getElementById('rentalIncome').value) || 0;
+            const taxLiability = parseFloat(document.getElementById('taxLiability').value) || 0;
+
+            // Calculations
+            const totalPersonalExpenses = ownerRent + ownerUtils;
+            const netRentalIncome = rentalIncome - taxLiability; 
+            const totalNetIncome = (jobIncome + netRentalIncome) - totalPersonalExpenses;
+
+            // Display
+            const outputDiv = document.getElementById('financialOutput');
+            const cashflowDisplay = document.getElementById('cashflowDisplay');
+            
+            const netIncomeStr = totalNetIncome.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+            const netRentalStr = netRentalIncome.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+            
+            outputDiv.innerHTML = `
+                <div class="net-position">Net Monthly Position: ${netIncomeStr}</div>
+                <small>
+                **Breakdown:** Job Income **+** Rental Profit (${netRentalStr}) **-** Personal Expenses
+                </small>
+            `;
+
+            if(totalNetIncome < 0) {
+                outputDiv.className = "financial-output negative-flow";
+                outputDiv.querySelector('.net-position').style.color = 'var(--danger-color)';
+            } else {
+                outputDiv.className = "financial-output positive-flow";
+                outputDiv.querySelector('.net-position').style.color = 'var(--success-color)';
+            }
+
+            cashflowDisplay.innerText = netRentalStr;
+        }
+
+        // Run on load
+        calculateFinances();
+    </script>
+</body>
+</html>
