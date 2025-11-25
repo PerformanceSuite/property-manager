@@ -1,0 +1,14 @@
+# --- General Operating System Files ---
+.DS_Store
+Thumbs.db
+
+# --- Development/Editor Files ---
+.vscode/
+.idea/
+*.log
+*.tmp
+
+# --- Dependencies (Future-Proofing) ---
+/node_modules
+/dist
+/build
